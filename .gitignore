@@ -1,0 +1,42 @@
+# ================ Frontend (VS Code) ================
+Frontend/node_modules/
+Frontend/dist/
+Frontend/build/
+Frontend/.env*
+Frontend/.cache/
+Frontend/coverage/
+Frontend/*.log
+Frontend/.next/          # Next.js
+Frontend/.svelte-kit/    # Svelte
+Frontend/.vscode/        # VS Code workspace settings (may contain local paths)
+Frontend/.DS_Store       # macOS metadata
+Frontend/Thumbs.db       # Windows thumbnail cache
+Frontend/.idea/          # JetBrains IDE (WebStorm, etc.)
+
+# Dependency directories
+Frontend/.pnpm-store/    # pnpm
+Frontend/.yarn/cache/    # Yarn 2+
+Frontend/.pnp.*          # Yarn Plug'n'Play
+
+# ================ Backend (Visual Studio) ================
+Backend/bin/
+Backend/obj/
+Backend/.vs/
+Backend/*.user
+Backend/*.suo
+Backend/appsettings.Development.json
+Backend/packages/
+Backend/TestResults/
+Backend/.vscode/
+Backend/.DS_Store        # macOS metadata
+Backend/Thumbs.db        # Windows thumbnail cache
+Backend/*.swp            # Vim swap files
+Backend/launchSettings.json # Local IIS/launch configs (optional)
+
+# ================ Global Ignores ================
+*.log
+*.tmp
+*.bak
+*.cache
+.DS_Store
+Thumbs.db
