@@ -251,7 +251,22 @@ namespace HRM.WEB.Controllers
             return Ok(educationresults);
         }
 
-////////////////////testing github track
+
+        [HttpGet("educationresultdropdown")]
+        public async Task<ActionResult<IEnumerable<BaseDropdownDto>>> GerEducationResults([FromQuery] int IdClient)
+        {
+            var educationresults = await appDbContext.EducationResults
+                .Where(m => m.IdClient == IdClient)
+                .Select(m => new BaseDropdownDto
+                {
+                    Id = m.Id,
+                    Text = m.ResultName
+                })
+                .ToListAsync();
+
+            return Ok(educationresults);
+        }
+
 
 
 
