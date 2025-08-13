@@ -1,0 +1,806 @@
+﻿using Azure.Core;
+using HRM.WEB.ChildEntitiesDTO;
+using HRM.WEB.Data;
+using HRM.WEB.DTO;
+using HRM.WEB.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Net;
+
+namespace HRM.WEB.Controllers
+{
+    [Route("api/employee")]
+    [ApiController]
+    public class EmployeeController(AppDbContext _appDbContext) : ControllerBase
+    {
+
+
+
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<GetEmployeeDTO>>> GetAllEmployees([FromQuery] int IdClient, CancellationToken cancellationToken)
+        {
+           var employees = await _appDbContext.Employees
+                .AsNoTracking()
+                .Where(e => e.IdClient == IdClient && e.IsActive == true)
+                .Select(e => new GetEmployeeDTO
+                {
+                    Id = e.Id,
+                    EmployeeName = e.EmployeeName,
+                    EmployeeNameBangla = e.EmployeeNameBangla,
+                    FatherName = e.FatherName,
+                    MotherName = e.MotherName,
+                    BirthDate = e.BirthDate,
+                    JoiningDate = e.JoiningDate,
+                    ContactNo = e.ContactNo,
+                    NationalIdentificationNumber = e.NationalIdentificationNumber,
+                    Address = e.Address,
+                    PresentAddress = e.PresentAddress,
+                    HasOvertime = e.HasOvertime,
+                    HasAttendenceBonus = e.HasAttendenceBonus,
+                    IsActive = e.IsActive,
+                    IdDepartment = e.IdDepartment,
+                    DepartmentName = e.Department.DepartName,
+                    IdSection = e.IdSection,
+                    SectionName = e.Section.SectionName,
+                    IdDesignation = e.IdDesignation,
+                    DesignationName = e.Designation != null ? e.Designation.DesignationName : null,
+                    IdEmployeeType = e.IdEmployeeType,
+                    EmployeeTypeName = e.EmployeeType != null ? e.EmployeeType.TypeName : null,
+                    IdJobType = e.IdJobType,
+                    JobTypeName = e.JobType != null ? e.JobType.JobTypeName : null,
+                    IdGender = e.IdGender,
+                    GenderName = e.Gender != null ? e.Gender.GenderName : null,
+                    IdReligion = e.IdReligion,
+                    ReligionName = e.Religion != null ? e.Religion.ReligionName : null,
+                    IdMaritalStatus = e.IdMaritalStatus,
+                    MaritalStatusName = e.MaritalStatus != null ? e.MaritalStatus.MaritalStatusName : null,
+                    IdWeekOff = e.IdWeekOff,
+                    WeekOffDay = e.WeekOff != null ? e.WeekOff.WeekOffDay : null,
+                    IdReportingManager = e.IdReportingManager,
+                    ReportingManagerName = e.ReportingManager != null ? e.ReportingManager.EmployeeName : null,
+
+                    CreatedBy = e.CreatedBy,
+                    SetDate = e.SetDate,
+                    EmployeeImageBase64 = ConvertImageToBase64(e.EmployeeImage),
+
+
+                    EmployeeDocuments = e.EmployeeDocuments.Select(doc => new EmployeeDocumentDTO
+                    {
+                        DocumentName = doc.DocumentName,
+                        FileName = doc.FileName,
+                        UploadedFileExtention = doc.UploadedFileExtention,
+                        UploadedFileBase64 = ConvertFileToBase64(doc.UploadedFile, doc.UploadedFileExtention),
+
+                    }).ToList(),
+
+                    EmployeeEducationInfos = e.EmployeeEducationInfos.Select(edu => new EmployeeEducationInfosDTO
+                    {
+                        IdEducationLevel = edu.IdEducationLevel,
+                        IdEducationExamination = edu.IdEducationExamination,
+                        IdEducationResult = edu.IdEducationResult,
+                        Cgpa = edu.Cgpa,
+                        ExamScale = edu.ExamScale,
+                        Marks = edu.Marks,
+                        Major = edu.Major,
+                        PassingYear = edu.PassingYear,
+                        InstituteName = edu.InstituteName,
+                        IsForeignInstitute = edu.IsForeignInstitute,
+                        Duration = edu.Duration,
+                        Achievement = edu.Achievement
+                    }).ToList(),
+
+                    EmployeeProfessionalCertifications = e.EmployeeProfessionalCertifications.Select(cert => new EmployeeProfessionalCertificationDTO
+                    {
+                        CertificationTitle = cert.CertificationTitle,
+                        CertificationInstitute = cert.CertificationInstitute,
+                        InstituteLocation = cert.InstituteLocation,
+                        FromDate = cert.FromDate,
+                        ToDate = cert.ToDate
+                    }).ToList(),
+
+
+
+                    EmployeefamilyInfos = e.EmployeeFamilyInfos.Select(family => new EmployeeFamilyInfoDTO
+                    {
+                        Name = family.Name, 
+                        IdGender = family.IdGender, 
+                        IdRelationship = family.IdRelationship, 
+
+                    }).ToList(),    
+                })
+                .ToListAsync(cancellationToken);
+
+            return Ok(employees);
+        }
+
+
+
+
+
+        [HttpGet("detail")]
+        public async Task<ActionResult<GetEmployeeDTO>> GetEmployeeById([FromQuery] int IdClient, [FromQuery] int id,  CancellationToken cancellationToken)
+        {
+            var employee = await _appDbContext.Employees
+                .AsNoTracking()
+                .Where(e => e.IdClient == IdClient && e.Id == id)
+                .Select(e => new GetEmployeeDTO
+                {
+                    Id = e.Id,
+                    EmployeeName = e.EmployeeName,
+                    EmployeeNameBangla = e.EmployeeNameBangla,
+                    FatherName = e.FatherName,
+                    MotherName = e.MotherName,
+                    IdReportingManager = e.IdReportingManager,
+                    IdJobType = e.IdJobType,
+                    IdEmployeeType = e.IdEmployeeType,
+                    BirthDate = e.BirthDate,
+                    JoiningDate = e.JoiningDate,
+                    IdGender = e.IdGender,
+                    IdReligion = e.IdReligion,
+                    IdDepartment = e.IdDepartment,
+                    IdSection = e.IdSection,
+                    IdDesignation = e.IdDesignation,
+                    HasOvertime = e.HasOvertime,
+                    HasAttendenceBonus = e.HasAttendenceBonus,
+                    IdWeekOff = e.IdWeekOff,
+                    Address = e.Address,
+                    PresentAddress = e.PresentAddress,
+                    NationalIdentificationNumber = e.NationalIdentificationNumber,
+                    ContactNo = e.ContactNo,
+                    IdMaritalStatus = e.IdMaritalStatus,
+                    IsActive = e.IsActive,
+                    CreatedBy = e.CreatedBy,
+                    SetDate = e.SetDate,
+                    EmployeeImageBase64 = ConvertImageToBase64(e.EmployeeImage),
+
+
+
+
+
+                    EmployeeDocuments = e.EmployeeDocuments.Select(doc => new EmployeeDocumentDTO
+                    {
+                        Id = doc.Id,    
+                        DocumentName = doc.DocumentName,
+                        FileName = doc.FileName,
+                        UploadDate = doc.UploadDate,
+                        UploadedFileExtention = doc.UploadedFileExtention,
+                        UploadedFileBase64 = ConvertFileToBase64(doc.UploadedFile, doc.UploadedFileExtention),
+
+                    }).ToList(),
+
+                    // Related Education Info
+                    EmployeeEducationInfos = e.EmployeeEducationInfos.Select(edu => new EmployeeEducationInfosDTO
+                    {
+                        Id = edu.Id,    
+                        IdEducationLevel = edu.IdEducationLevel,
+                        IdEducationExamination = edu.IdEducationExamination,
+                        IdEducationResult = edu.IdEducationResult,
+                        Cgpa = edu.Cgpa,
+                        ExamScale = edu.ExamScale,
+                        Marks = edu.Marks,
+                        Major = edu.Major,
+                        PassingYear = edu.PassingYear,
+                        InstituteName = edu.InstituteName,
+                        IsForeignInstitute = edu.IsForeignInstitute,
+                        Duration = edu.Duration,
+                        Achievement = edu.Achievement
+                    }).ToList(),
+
+                    // Related Certifications
+                    EmployeeProfessionalCertifications = e.EmployeeProfessionalCertifications.Select(cert => new EmployeeProfessionalCertificationDTO
+                    {   Id = cert.Id,       
+                        CertificationTitle = cert.CertificationTitle,
+                        CertificationInstitute = cert.CertificationInstitute,
+                        InstituteLocation = cert.InstituteLocation,
+                        FromDate = cert.FromDate,
+                        ToDate = cert.ToDate
+                    }).ToList(),
+
+                    // Reporting Manager Name from self-reference
+                    ReportingManagerName = e.ReportingManager != null ? e.ReportingManager.EmployeeName : null,
+
+
+                    EmployeefamilyInfos = e.EmployeeFamilyInfos.Select(family => new EmployeeFamilyInfoDTO
+                    {
+                        Id = family.Id,     
+                        Name = family.Name,
+                        IdGender = family.IdGender,
+                        IdRelationship = family.IdRelationship,
+                        DateOfBirth = family.DateOfBirth,
+                        ContactNo = family.ContactNo,
+                        CurrentAddress = family.CurrentAddress,
+                        PermanentAddress = family.PermanentAddress,
+
+                    }).ToList(),    
+
+
+                   
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (employee == null)
+                return NotFound("Employee not found.");
+
+            return Ok(employee);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        [HttpPost]
+
+        public async Task<ActionResult<Employee>> CreateEmployee([FromForm] CreateEmployeeDTO createDto, CancellationToken cancellationToken)
+        {
+            var form = await Request.ReadFormAsync();
+
+            if (form.TryGetValue("employeeEducationInfos", out var educationJson))
+            {
+                createDto.employeeEducationInfos = JsonConvert.DeserializeObject<List<EmployeeEducationInfosDTO>>(educationJson) ?? new List<EmployeeEducationInfosDTO>();
+            }
+            if (form.TryGetValue("employeeFamilyInfo", out var familyJson))
+            {
+                createDto.employeeFamilyInfo = JsonConvert.DeserializeObject<List<EmployeeFamilyInfoDTO>>(familyJson) ?? new List<EmployeeFamilyInfoDTO>();
+            }
+            if (form.TryGetValue("employeeDocument", out var documentJson))
+            {
+                createDto.employeeDocument = JsonConvert.DeserializeObject<List<EmployeeDocumentDTO>>(documentJson) ?? new List<EmployeeDocumentDTO>();
+            }
+            if (form.TryGetValue("employeeProfessionalCertification", out var certificationJson))
+            {
+                createDto.employeeProfessionalCertification = JsonConvert.DeserializeObject<List<EmployeeProfessionalCertificationDTO>>(certificationJson) ?? new List<EmployeeProfessionalCertificationDTO>();
+            }
+            const long maxFileSize = 10 * 1024 * 1024;
+
+            //Validate EmployeeImage size
+            if (createDto.EmployeeImage != null && createDto.EmployeeImage.Length > maxFileSize)
+            {
+                return BadRequest("Employee image size cannot be greater than 10 MB.");
+            }
+
+
+           
+            // Convert Employee image to byte[]
+            byte[]? employeeImageBytes = null;
+            if (createDto.EmployeeImage != null && createDto.EmployeeImage.Length > 0)
+            {
+                using var ms = new MemoryStream();
+                await createDto.EmployeeImage.CopyToAsync(ms);
+                employeeImageBytes = ms.ToArray();
+            }
+
+            //Convert document files to byte[]
+            foreach (var doc in createDto.employeeDocument)
+            {
+                if (doc.UploadedFile != null)
+                {
+                    if (doc.UploadedFile.Length > maxFileSize)
+                    {
+                        return BadRequest($"Document '{doc.FileName}' size cannot be greater than 10 MB.");
+                    }
+                    using var ms = new MemoryStream();
+                    await doc.UploadedFile.CopyToAsync(ms);
+                    doc.UploadedFileExtention = Path.GetExtension(doc.UploadedFile.FileName);
+                    doc.FileName = Path.GetFileName(doc.UploadedFile.FileName);
+                    doc.UploadDate = DateTime.Now;
+                    doc.UploadedFileBytes = ms.ToArray();
+
+                }
+            }
+
+
+
+
+
+            var employee = new Employee
+            {
+                EmployeeName = createDto.EmployeeName,
+                EmployeeNameBangla = createDto.EmployeeNameBangla,
+                EmployeeImage = employeeImageBytes,
+                FatherName = createDto.FatherName,
+                MotherName = createDto.MotherName,
+                IdReportingManager = createDto.IdReportingManager,
+                IdJobType = createDto.IdJobType,
+                IdEmployeeType = createDto.IdEmployeeType,
+                BirthDate = createDto.BirthDate,
+                JoiningDate = createDto.JoiningDate,
+                IdGender = createDto.IdGender,
+                IdReligion = createDto.IdReligion,
+                IdDepartment = createDto.IdDepartment,
+                IdSection = createDto.IdSection,
+                IdDesignation = createDto.IdDesignation,
+                HasOvertime = createDto.HasOvertime ?? false,
+                HasAttendenceBonus = createDto.HasAttendenceBonus ?? false,
+                IdWeekOff = createDto.IdWeekOff,
+                Address = createDto.Address,
+                PresentAddress = createDto.PresentAddress,
+                NationalIdentificationNumber = createDto.NationalIdentificationNumber,
+                ContactNo = createDto.ContactNo,
+                IdMaritalStatus = createDto.IdMaritalStatus,
+                IsActive = createDto.IsActive ?? true,
+                CreatedBy = createDto.CreatedBy,
+                SetDate = DateTime.Now,
+                IdClient = createDto.IdClient,
+
+                EmployeeDocuments = createDto.employeeDocument.Select(doc => new EmployeeDocument
+                {
+                    DocumentName = doc.DocumentName,
+                    FileName = doc.FileName,
+                    UploadedFileExtention = doc.UploadedFileExtention,
+                    UploadedFile = doc.UploadedFileBytes,
+                    UploadDate = doc.UploadDate,
+                    SetDate = DateTime.Now,
+                    CreatedBy = createDto.CreatedBy,
+                    IdClient = doc.IdClient,
+                }).ToList(),
+
+
+
+                EmployeeEducationInfos = createDto.employeeEducationInfos.Select(edu => new EmployeeEducationInfo
+                {
+                    IdEducationLevel = edu.IdEducationLevel,
+                    IdEducationExamination = edu.IdEducationExamination,
+                    IdEducationResult = edu.IdEducationResult,
+                    Cgpa = edu.Cgpa,
+                    ExamScale = edu.ExamScale,
+                    Marks = edu.Marks,
+                    Major = edu.Major,
+                    PassingYear = edu.PassingYear,
+                    InstituteName = edu.InstituteName,
+                    IsForeignInstitute = edu.IsForeignInstitute,
+                    Duration = edu.Duration,
+                    Achievement = edu.Achievement,
+                    SetDate = DateTime.Now,
+                    CreatedBy = createDto.CreatedBy,
+                    IdClient = edu.IdClient,
+                }).ToList(),
+
+                EmployeeProfessionalCertifications = createDto.employeeProfessionalCertification.Select(cert => new EmployeeProfessionalCertification
+                {
+                    CertificationTitle = cert.CertificationTitle,
+                    CertificationInstitute = cert.CertificationInstitute,
+                    InstituteLocation = cert.InstituteLocation,
+                    FromDate = cert.FromDate,
+                    ToDate = cert.ToDate,
+                    SetDate = DateTime.Now,
+                    CreatedBy = createDto.CreatedBy,
+                    IdClient = cert.IdClient,
+                }).ToList(),
+
+
+                EmployeeFamilyInfos = createDto.employeeFamilyInfo.Select(family => new EmployeeFamilyInfo
+                {
+                    Name = family.Name,
+                    IdGender = family.IdGender,
+                    IdRelationship = family.IdRelationship,
+                    DateOfBirth = family.DateOfBirth,
+                    ContactNo = family.ContactNo,
+                    CurrentAddress = family.CurrentAddress,
+                    PermanentAddress = family.PermanentAddress,
+
+                }).ToList(),
+
+
+
+
+
+
+
+            };
+
+
+
+
+            _appDbContext.Employees.Add(employee);
+            await _appDbContext.SaveChangesAsync(cancellationToken);
+
+            return Ok(new { message = "Employee created successfully." });
+
+
+
+
+        }
+
+
+        [HttpPut]
+
+        public async Task<int> UpdateEmployee([FromForm] UpdateEmployeeDto employee, CancellationToken cancellationToken)
+        {
+
+            var form = await Request.ReadFormAsync();
+
+            if (form.TryGetValue("employeeEducationInfos", out var educationJson))
+            {
+                employee.employeeEducationInfos = JsonConvert.DeserializeObject<List<EmployeeEducationInfosDTO>>(educationJson) ?? new List<EmployeeEducationInfosDTO>();
+            }
+            if (form.TryGetValue("employeeFamilyInfo", out var familyJson))
+            {
+                employee.employeeFamilyInfo = JsonConvert.DeserializeObject<List<EmployeeFamilyInfoDTO>>(familyJson) ?? new List<EmployeeFamilyInfoDTO>();
+            }
+            if (form.TryGetValue("employeeDocument", out var documentJson))
+            {
+                employee.employeeDocument = JsonConvert.DeserializeObject<List<EmployeeDocumentDTO>>(documentJson) ?? new List<EmployeeDocumentDTO>();
+            }
+            if (form.TryGetValue("employeeProfessionalCertification", out var certificationJson))
+            {
+                employee.employeeProfessionalCertification = JsonConvert.DeserializeObject<List<EmployeeProfessionalCertificationDTO>>(certificationJson) ?? new List<EmployeeProfessionalCertificationDTO>();
+            }
+
+            if (employee == null)
+                throw new Exception($"data not found: {nameof(employee)}");
+
+            const long maxFileSize = 10 * 1024 * 1024;
+
+            //var idClient = employee.IdClient;
+            //var id = employee.Id;
+
+            var existingEmployee = await _appDbContext.Employees
+                .Include(e => e.EmployeeDocuments)
+                .Include(e => e.EmployeeEducationInfos)
+                .Include(e => e.EmployeeProfessionalCertifications)
+                .Include(e => e.EmployeeFamilyInfos)
+                .FirstOrDefaultAsync(e => e.IdClient == employee.IdClient && e.Id == employee.Id, cancellationToken);
+
+            if (existingEmployee == null) return 0;
+
+            existingEmployee.EmployeeName = employee.EmployeeName ?? existingEmployee.EmployeeName;
+            existingEmployee.EmployeeNameBangla = employee.EmployeeNameBangla ?? existingEmployee.EmployeeNameBangla;
+            existingEmployee.FatherName = employee.FatherName ?? existingEmployee.FatherName;
+            existingEmployee.MotherName = employee.MotherName ?? existingEmployee.MotherName;
+            existingEmployee.BirthDate = employee.BirthDate ?? existingEmployee.BirthDate;
+            existingEmployee.JoiningDate = employee.JoiningDate ?? existingEmployee.JoiningDate;
+            existingEmployee.ContactNo = employee.ContactNo ?? existingEmployee.ContactNo;
+            existingEmployee.NationalIdentificationNumber = employee.NationalIdentificationNumber ?? existingEmployee.NationalIdentificationNumber;
+            existingEmployee.Address = employee.Address ?? existingEmployee.Address;
+            
+            existingEmployee.PresentAddress = employee.PresentAddress ?? existingEmployee.PresentAddress;
+            existingEmployee.HasOvertime = employee.HasOvertime ?? existingEmployee.HasOvertime;
+            existingEmployee.HasAttendenceBonus = employee.HasAttendenceBonus ?? existingEmployee.HasAttendenceBonus;
+            existingEmployee.IsActive = employee.IsActive ?? existingEmployee.IsActive;
+
+            existingEmployee.IdDepartment = employee.IdDepartment;
+            existingEmployee.IdSection = employee.IdSection;
+            existingEmployee.IdDesignation = employee.IdDesignation ?? employee.IdDesignation;
+
+            existingEmployee.IdEmployeeType = employee.IdEmployeeType ?? employee.IdEmployeeType;
+
+            existingEmployee.IdJobType = employee.IdJobType ?? employee.IdJobType;
+
+            existingEmployee.IdGender = employee.IdGender ?? employee.IdGender;
+
+            existingEmployee.IdReligion = employee.IdReligion ?? employee.IdReligion;
+            existingEmployee.IdMaritalStatus = employee.IdMaritalStatus ?? employee.IdMaritalStatus;
+
+            existingEmployee.IdWeekOff = employee.IdWeekOff ?? employee.IdWeekOff;
+
+            existingEmployee.IdReportingManager = employee.IdReportingManager ?? employee.IdReportingManager;
+
+            existingEmployee.CreatedBy = employee.CreatedBy;
+
+
+
+
+            existingEmployee.SetDate = DateTime.Now;
+
+            if (employee.EmployeeImage != null && employee.EmployeeImage.Length > 0)
+            {
+
+                if (employee.EmployeeImage.Length > maxFileSize)
+                    throw new Exception("Employee image size cannot exceed 10 MB.");
+
+                using var ms = new MemoryStream();
+                await employee.EmployeeImage.CopyToAsync(ms, cancellationToken);
+                existingEmployee.EmployeeImage = ms.ToArray();
+            }
+
+
+            //delete obsolete data
+
+            var docsToRemove = existingEmployee.EmployeeDocuments
+                .Where(ed => ed.IdClient == employee.IdClient && !employee.employeeDocument.Any(d => d.IdClient == ed.IdClient && d.Id == ed.Id))
+                .ToList();
+
+            foreach (var doc in docsToRemove)
+            {
+                _appDbContext.EmployeeDocuments.Remove(doc);
+            }
+
+
+            var eduInfoToRemove = existingEmployee.EmployeeEducationInfos
+                 .Where(eei => eei.IdClient == employee.IdClient && !employee.employeeEducationInfos.Any(ei => ei.IdClient == eei.IdClient && ei.Id == eei.Id))
+                 .ToList();
+
+            foreach (var edu in eduInfoToRemove)
+            {
+                existingEmployee.EmployeeEducationInfos.Remove(edu);
+            }
+
+
+            var familyInfoToRemove = existingEmployee.EmployeeFamilyInfos
+               .Where(efi => efi.IdClient == employee.IdClient && !employee.employeeFamilyInfo.Any(ef => ef.IdClient == efi.IdClient && ef.Id == efi.Id))
+               .ToList();
+
+            foreach (var fam in familyInfoToRemove)
+            {
+                existingEmployee.EmployeeFamilyInfos.Remove(fam);
+            }
+
+            var certificateToRemove = existingEmployee.EmployeeProfessionalCertifications
+                .Where(epc => epc.IdClient == employee.IdClient && !employee.employeeProfessionalCertification.Any(c => c.IdClient == epc.IdClient && c.Id == epc.Id))
+                .ToList();
+
+            foreach (var cert in certificateToRemove)
+            {
+                existingEmployee.EmployeeProfessionalCertifications.Remove(cert);
+            }
+
+
+
+
+
+           
+
+
+
+
+            //up/insert information
+            foreach (var item in employee.employeeDocument)
+            {
+                var existingEntry = existingEmployee.EmployeeDocuments.FirstOrDefault(ed => ed.IdClient == item.IdClient && ed.Id == item.Id && ed.Id > 0);
+                if (existingEntry != null)
+                {
+                    existingEntry.DocumentName = item.DocumentName;
+                    existingEntry.FileName = item.FileName;
+                    existingEntry.UploadDate = item.UploadDate;
+                    existingEntry.UploadedFileExtention = item.UploadedFileExtention;
+                    existingEntry.SetDate = DateTime.Now;
+
+                    if (item.UploadedFile != null && item.UploadedFile.Length > 0)
+                    {
+                        if (item.UploadedFile.Length > maxFileSize)
+                            throw new Exception($"Document '{item.FileName}' exceeds the 10 MB size limit."); // 🔽 Validation
+
+                        using var ms = new MemoryStream();
+                        await item.UploadedFile.CopyToAsync(ms, cancellationToken);
+                        existingEntry.UploadedFile = ms.ToArray();
+                    }
+                }
+                else
+                {
+                    var newEmployeeDocument = new EmployeeDocument()
+                    {
+                        IdClient = item.IdClient,
+                        IdEmployee = existingEmployee.Id,
+                        DocumentName = item.DocumentName,
+                        FileName = item.FileName,
+                        UploadDate = item.UploadDate,
+                        UploadedFileExtention = item.UploadedFileExtention,
+                        SetDate = DateTime.Now
+
+
+                    };
+
+                    if (item.UploadedFile != null && item.UploadedFile.Length > 0)
+                    {
+                        if (item.UploadedFile.Length > maxFileSize)
+                            throw new Exception($"Document '{item.FileName}' exceeds the 10 MB size limit."); // 🔽 Validation
+
+                        using var ms = new MemoryStream();
+                        await item.UploadedFile.CopyToAsync(ms, cancellationToken);
+                        newEmployeeDocument.UploadedFile = ms.ToArray();
+                    }
+
+                    existingEmployee.EmployeeDocuments.Add(newEmployeeDocument);
+                }
+            }
+
+
+            foreach (var item in employee.employeeEducationInfos)
+            {
+                var existingEntry = existingEmployee.EmployeeEducationInfos.FirstOrDefault(ei => ei.IdClient == item.IdClient && ei.Id == item.Id && ei.Id > 0);
+                if (existingEntry != null)
+                {
+                    existingEntry.IdEducationLevel = item.IdEducationLevel;
+                    existingEntry.IdEducationExamination = item.IdEducationExamination;
+                    existingEntry.IdEducationResult = item.IdEducationResult;
+                    existingEntry.Cgpa = item.Cgpa;
+                    existingEntry.Marks = item.Marks;
+                    existingEntry.PassingYear = item.PassingYear;
+                    existingEntry.InstituteName = item.InstituteName;
+                    existingEntry.Major = item.Major;
+                    existingEntry.IsForeignInstitute = item.IsForeignInstitute;
+                    existingEntry.Duration = item.Duration;
+                    existingEntry.Achievement = item.Achievement;
+                    existingEntry.SetDate = DateTime.Now;
+                }
+                else
+                {
+                    var newEmployeeEducationInfo = new EmployeeEducationInfo()
+                    {
+                        IdClient = item.IdClient,
+                        IdEmployee = existingEmployee.Id,
+                        IdEducationLevel = item.IdEducationLevel,
+                        IdEducationExamination = item.IdEducationExamination,
+                        IdEducationResult = item.IdEducationResult,
+                        Cgpa = item.Cgpa,
+                        Marks = item.Marks,
+                        PassingYear = item.PassingYear,
+                        InstituteName = item.InstituteName,
+                        Major = item.Major,
+                        IsForeignInstitute = item.IsForeignInstitute,
+                        Duration = item.Duration,
+                        Achievement = item.Achievement,
+                        SetDate = DateTime.Now
+                    };
+
+                    existingEmployee.EmployeeEducationInfos.Add(newEmployeeEducationInfo);
+                }
+            }
+
+
+            foreach (var item in employee.employeeProfessionalCertification)
+            {
+                var existingEntry = existingEmployee.EmployeeProfessionalCertifications.FirstOrDefault(epc => epc.IdClient == item.IdClient && epc.Id == item.Id && epc.Id > 0);
+                if (existingEntry != null)
+                {
+                    existingEntry.CertificationTitle = item.CertificationTitle;
+                    existingEntry.CertificationInstitute = item.CertificationInstitute;
+                    existingEntry.InstituteLocation = item.InstituteLocation;
+                    existingEntry.FromDate = item.FromDate;
+                    existingEntry.ToDate = item.ToDate;
+                    existingEntry.SetDate = DateTime.Now;
+                }
+                else
+                {
+                    var newCertification = new EmployeeProfessionalCertification
+                    {
+                        IdClient = item.IdClient,
+                        IdEmployee = existingEmployee.Id,
+                        CertificationTitle = item.CertificationTitle,
+                        CertificationInstitute = item.CertificationInstitute,
+                        InstituteLocation = item.InstituteLocation,
+                        FromDate = item.FromDate,
+                        ToDate = item.ToDate,
+                        SetDate = DateTime.Now
+                    };
+                    existingEmployee.EmployeeProfessionalCertifications.Add(newCertification);
+                }
+            }
+
+            foreach (var item in employee.employeeFamilyInfo)
+            {
+                var existingEntry = existingEmployee.EmployeeFamilyInfos.FirstOrDefault(efi => efi.IdClient == item.IdClient && efi.Id == item.Id && efi.Id > 0);
+                if (existingEntry != null)
+                {
+                    existingEntry.Name = item.Name;
+                    existingEntry.IdGender = item.IdGender;
+                    existingEntry.IdRelationship = item.IdRelationship;
+                    existingEntry.SetDate = DateTime.Now;
+                    existingEntry.ContactNo = item.ContactNo;
+                    existingEntry.CurrentAddress = item.CurrentAddress;
+                    existingEntry.PermanentAddress = item.PermanentAddress;
+
+
+                }
+                else
+                {
+                    var familyinfos = new EmployeeFamilyInfo
+                    {
+                        IdClient = item.IdClient,
+                        IdEmployee = existingEmployee.Id,
+                        Name = item.Name,
+                        IdGender = item.IdGender,
+                        IdRelationship = item.IdRelationship,
+                        DateOfBirth = item.DateOfBirth,
+                        SetDate = DateTime.Now,
+                        ContactNo = item.ContactNo,
+                        CurrentAddress = item.CurrentAddress,
+                        PermanentAddress = item.PermanentAddress,
+                    };
+                    existingEmployee.EmployeeFamilyInfos.Add(familyinfos);
+                }
+            }
+
+
+
+
+
+
+
+
+            var result = await _appDbContext.SaveChangesAsync(cancellationToken);
+
+            return result;
+        }
+
+
+
+
+
+
+
+        [HttpDelete("{IdClient}/{id}")]
+        public async Task<IActionResult> SoftDeleteEmployee([FromRoute] int IdClient, [FromRoute] int id, CancellationToken cancellationToken)
+        {
+            var employee = await _appDbContext.Employees
+                .FirstOrDefaultAsync(e => e.IdClient == IdClient && e.Id == id);
+
+            if (employee == null)
+                return NotFound("Employee not found.");
+
+            employee.IsActive = false;
+            await _appDbContext.SaveChangesAsync(cancellationToken);
+
+            return Ok(new { message = "Employee soft deleted (deactivated) successfully." });
+
+
+        }
+
+
+        private static string GetMimeType(string? extension)
+        {
+            return extension?.ToLower() switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".pdf" => "application/pdf",
+                ".doc" => "application/msword",
+                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".xls" => "application/vnd.ms-excel",
+                ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                ".txt" => "text/plain",
+                _ => "application/octet-stream" // fallback
+            };
+        }
+
+        //private static string? ConvertImageToBase64(byte[]? image)
+        //{
+        //    return image != null
+        //        ? $"data:image/jpeg;base64,{Convert.ToBase64String(image)}"
+        //        : null;
+        //}
+
+        private static string? ConvertImageToBase64(byte[]? image)
+        {
+            return image != null
+                ? Convert.ToBase64String(image)
+                : null;
+        }
+
+
+        private static string? ConvertFileToBase64(byte[]? fileBytes, string? fileExtension)
+        {
+            if (fileBytes == null || string.IsNullOrEmpty(fileExtension))
+                return null;
+
+            var mimeType = GetMimeType(fileExtension);
+            return $"data:{mimeType};base64,{Convert.ToBase64String(fileBytes)}";
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+}
