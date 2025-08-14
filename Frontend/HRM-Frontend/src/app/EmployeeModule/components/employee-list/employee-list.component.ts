@@ -541,7 +541,7 @@ onEdit(id: number) {
   if (documentArray && documentArray.length > 0) {
     const documents = documentArray.value.map((doc: any) => ({
       ...doc,
-       id: doc.id ?? null,                    // existing record id
+      id: doc.id ?? null,                    // existing record id
       IdClient: +doc.IdClient,   
       documentName: doc.documentName || '',
       filename: doc.filename || '',
@@ -558,7 +558,7 @@ onEdit(id: number) {
   if (certArray && certArray.length > 0) {
     const certifications = certArray.value.map((cert: any) => ({
       ...cert,
-       id: cert.id ?? null,                    // existing record id
+      id: cert.id ?? null,                    // existing record id
       IdClient: +cert.IdClient,
       certificationTitle: cert.certificationTitle?.trim() || '',
       certificationInstitute: cert.certificationInstitute?.trim() || '',
@@ -576,7 +576,7 @@ onEdit(id: number) {
   if (familyArray && familyArray.length > 0) {
     const familyInfos = familyArray.value.map((fam: any) => ({
       ...fam,
-       id: fam.id ?? null,                    // existing record id
+      id: fam.id ?? null,                    // existing record id
       IdClient: +fam.IdClient,
       name: fam.name?.trim() || '',
       idGender: fam.idGender ? +fam.idGender : null,
@@ -592,97 +592,97 @@ onEdit(id: number) {
 
 
   // Append image file (if any)
-  if (this.selectedImageFile) {
-    formData.append('employeeImage', this.selectedImageFile);
-  }
+      if (this.selectedImageFile) {
+        formData.append('employeeImage', this.selectedImageFile);
+      }
 
   
 
-  if (this.selectedEmployeeId) {
-      //formData.append('id', this.selectedEmployeeId!.toString());
+      if (this.selectedEmployeeId) {
+        //formData.append('id', this.selectedEmployeeId!.toString());
 
-      this.employeeService.updateEmployee(formData).subscribe({
-        next: (res) => {
-          alert('Employee updated successfully!');
-          this.isReadonly = true;
-          this.loadEmployees();
-          this.viewEmployeeDetails(this.selectedEmployeeId!);
-        },
-        error: (err) => {
-          console.error('Error updating employee:', err);
-        }
-      });
-      } else {
-        this.employeeService.createEmployee(formData).subscribe({
+        this.employeeService.updateEmployee(formData).subscribe({
           next: (res) => {
-            alert('Employee created successfully!');
+            alert('Employee updated successfully!');
             this.isReadonly = true;
             this.loadEmployees();
+            this.viewEmployeeDetails(this.selectedEmployeeId!);
           },
           error: (err) => {
-            console.error('Error creating employee:', err);
+            console.error('Error updating employee:', err);
           }
         });
-      }
-
-}
-
-
-
-
-
-
-
-
-
-    onEmployeeImageSelected(event: Event): void {
-      const input = event.target as HTMLInputElement;
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-
-        // Store in a class property if needed later
-        this.selectedImageFile = file;
-
-        // Patch correct field name to the form
-        this.employeeForm.patchValue({ employeeImage: file }); // <-- match DTO name
-        this.employeeForm.get('employeeImage')?.updateValueAndValidity();
-
-        // Optional: set preview
-        const reader = new FileReader();
-        reader.onload = () => {
-          const base64String = (reader.result as string).split(',')[1];
-          this.employeeForm.patchValue({
-            employeeImageBase64: base64String,
-            employeeImageExtension: file.name.split('.').pop()
+        } else {
+          this.employeeService.createEmployee(formData).subscribe({
+            next: (res) => {
+              alert('Employee created successfully!');
+              this.isReadonly = true;
+              this.loadEmployees();
+            },
+            error: (err) => {
+              console.error('Error creating employee:', err);
+            }
           });
-        };
-        reader.readAsDataURL(file);
-      }
-    }
+        }
 
-   onImageSelected(event: Event, index: number): void {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files[0]) {
-    const file = input.files[0];
-    const documentsArray = this.employeeForm.get('employeeDocument') as FormArray;
-    if (documentsArray && documentsArray.at(index)) {
-      const docGroup = documentsArray.at(index);
-      docGroup.patchValue({
-        filename: file.name,
-        uploadedFileExtention: file.name.split('.').pop()
-      });
-      // Optionally store base64 if needed
+      } 
+ 
+
+
+
+
+
+
+
+
+  onEmployeeImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+
+      // Store in a class property if needed later
+      this.selectedImageFile = file;
+
+      // Patch correct field name to the form
+      this.employeeForm.patchValue({ employeeImage: file }); // <-- match DTO name
+      this.employeeForm.get('employeeImage')?.updateValueAndValidity();
+
+      // Optional: set preview
       const reader = new FileReader();
       reader.onload = () => {
         const base64String = (reader.result as string).split(',')[1];
-        docGroup.patchValue({
-          uploadedFileBase64: base64String // if you have this control
+        this.employeeForm.patchValue({
+          employeeImageBase64: base64String,
+          employeeImageExtension: file.name.split('.').pop()
         });
       };
       reader.readAsDataURL(file);
     }
   }
-}
+
+  onImageSelected(event: Event, index: number): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const documentsArray = this.employeeForm.get('employeeDocument') as FormArray;
+      if (documentsArray && documentsArray.at(index)) {
+        const docGroup = documentsArray.at(index);
+        docGroup.patchValue({
+          filename: file.name,
+          uploadedFileExtention: file.name.split('.').pop()
+        });
+        // Optionally store base64 if needed
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64String = (reader.result as string).split(',')[1];
+          docGroup.patchValue({
+            uploadedFileBase64: base64String // if you have this control
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  }
 
 
 
@@ -704,13 +704,13 @@ onEdit(id: number) {
 
 
 
-  private formatDateForInput(dateValue: string | Date): string {
-  const date = new Date(dateValue);
-  const year = date.getFullYear();
-  const month = ('0' + (date.getMonth() + 1)).slice(-2);
-  const day = ('0' + date.getDate()).slice(-2);
-  return `${year}-${month}-${day}`;
-}
+    private formatDateForInput(dateValue: string | Date): string {
+    const date = new Date(dateValue);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
 
 
 
