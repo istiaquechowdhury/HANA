@@ -40,3 +40,4 @@ Backend/launchSettings.json # Local IIS/launch configs (optional)
 *.cache
 .DS_Store
 Thumbs.db
+**/Logs/

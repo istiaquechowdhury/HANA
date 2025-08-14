@@ -252,20 +252,6 @@ namespace HRM.WEB.Controllers
         }
 
 
-        [HttpGet("educationresultdropdown")]
-        public async Task<ActionResult<IEnumerable<BaseDropdownDto>>> get([FromQuery] int IdClient)
-        {
-            var educationresults = await appDbContext.EducationResults
-                .Where(m => m.IdClient == IdClient)
-                .Select(m => new BaseDropdownDto
-                {
-                    Id = m.Id,
-                    Text = m.ResultName
-                })
-                .ToListAsync();
-
-            return Ok(educationresults);
-        }
 
 
 
