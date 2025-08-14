@@ -253,7 +253,7 @@ namespace HRM.WEB.Controllers
 
 
         [HttpGet("educationresultdropdown")]
-        public async Task<ActionResult<IEnumerable<BaseDropdownDto>>> GerEducationResults([FromQuery] int IdClient)
+        public async Task<ActionResult<IEnumerable<BaseDropdownDto>>> get([FromQuery] int IdClient)
         {
             var educationresults = await appDbContext.EducationResults
                 .Where(m => m.IdClient == IdClient)
@@ -266,7 +266,6 @@ namespace HRM.WEB.Controllers
 
             return Ok(educationresults);
         }
-
 
 
 
