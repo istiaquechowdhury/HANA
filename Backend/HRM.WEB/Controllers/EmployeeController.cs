@@ -22,7 +22,7 @@ namespace HRM.WEB.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetEmployeeDTO>>> GetAllEmployees([FromQuery] int IdClient, CancellationToken cancellationToken)
         {
-           var employees = await _appDbContext.Employees
+         var employees = await _appDbContext.Employees
                 .AsNoTracking()
                 .Where(e => e.IdClient == IdClient && e.IsActive == true)
                 .Select(e => new GetEmployeeDTO
