@@ -13,7 +13,8 @@ import { observableToBeFn } from 'rxjs/internal/testing/TestScheduler';
 export class EmployeeService {
 
 
-        private baseUrl = 'http://localhost:5045/api/employee';
+        //private baseUrl = 'http://localhost:5045/api/employee';
+        private baseUrl = 'https://localhost:44322/api/employee';
         private clientId = '10001001';
 
         constructor(private http: HttpClient) {}
