@@ -25,7 +25,7 @@
         <form [formGroup]="filterForm">
           <select id="designationFilter" class="form-select" formControlName="selectedDesignation">
             <option value="">All</option>
-            <option *ngFor="let designation of designationList" [value]="designation">
+            <option *ngFor="let designation of designationList()" [value]="designation">
               {{ designation }}
             </option>
           </select>
@@ -36,7 +36,7 @@
       <ul class="list-group">
         <li 
           class="list-group-item" 
-          *ngFor="let employee of filteredEmployees"
+          *ngFor="let employee of filteredEmployees()"
           (click)="viewEmployeeDetails(employee.id)" 
           [ngClass]="{'active': selectedEmployeeId === employee.id}"
           style="cursor: pointer;">
@@ -158,7 +158,7 @@
                     <label for="idDesignation">Designation</label>
                     <select formControlName="idDesignation" class="form-control">
                       <option value="">-- Select Designation --</option>
-                      <option *ngFor="let designation of designations" [value]="designation.id">{{ designation.text }}</option>
+                      <option *ngFor="let designation of designations()" [value]="designation.id">{{ designation.text }}</option>
                     </select>
                  </div>
 
@@ -169,7 +169,7 @@
                   <label for="idDepartment">Department</label>
                   <select formControlName="idDepartment" class="form-control">
                     <option value="">-- Select Department --</option>
-                    <option *ngFor="let dept of departments" [value]="dept.id">{{ dept.text }}</option>
+                    <option *ngFor="let dept of departments()" [value]="dept.id">{{ dept.text }}</option>
                   </select>
 
                   <div class="invalid-feedback d-block" *ngIf="employeeForm.get('idDepartment')?.invalid">
@@ -183,7 +183,7 @@
                     <label for="idSection">Section</label>
                       <select formControlName="idSection" class="form-control">
                         <option value="">-- Select Section --</option>
-                        <option *ngFor="let sec of sections" [value]="sec.id">{{ sec.text }}</option>
+                        <option *ngFor="let sec of sections()" [value]="sec.id">{{ sec.text }}</option>
                       </select>
 
                     <div class="invalid-feedback d-block" *ngIf="employeeForm.get('idSection')?.invalid">
@@ -202,7 +202,7 @@
                 <label for="idEmployeeType">Employee Type</label>
                 <select formControlName="idEmployeeType" class="form-control">
                   <option value="">-- Select Employee Type --</option>
-                  <option *ngFor="let emptype of employeetypes" [value]="emptype.id">{{ emptype.text }}</option>
+                  <option *ngFor="let emptype of employeetypes()" [value]="emptype.id">{{ emptype.text }}</option>
                 </select>
               </div>
 
@@ -210,7 +210,7 @@
                 <label for="idJobType">Job Type</label>
                 <select formControlName="idJobType" class="form-control">
                   <option value="">-- Select Job Type --</option>
-                  <option *ngFor="let jobtype of jobtypes" [value]="jobtype.id">{{ jobtype.text }}</option>
+                  <option *ngFor="let jobtype of jobtypes()" [value]="jobtype.id">{{ jobtype.text }}</option>
                 </select>
               </div>
 
@@ -218,7 +218,7 @@
                 <label for="idGender">Genders</label>
                 <select formControlName="idGender" class="form-control">
                   <option value="">-- Select Genders Type --</option>
-                  <option *ngFor="let gender of genders" [value]="gender.id">{{ gender.text }}</option>
+                  <option *ngFor="let gender of genders()" [value]="gender.id">{{ gender.text }}</option>
                 </select>
               </div>
 
@@ -226,7 +226,7 @@
                 <label for="idReligion">Religion</label>
                 <select formControlName="idReligion" class="form-control">
                   <option value="">-- Select Religion --</option>
-                  <option *ngFor="let religion of religions" [value]="religion.id">{{ religion.text }}</option>
+                  <option *ngFor="let religion of religions()" [value]="religion.id">{{ religion.text }}</option>
                 </select>
               </div>
 
@@ -242,7 +242,7 @@
                       <label for="idMaritalStatus" class="form-label">Marital Status</label>
                       <select formControlName="idMaritalStatus" class="form-control">
                         <option value="">-- Select Marital Status --</option>
-                        <option *ngFor="let MaritalStatus of maritalstatuses" [value]="MaritalStatus.id">
+                        <option *ngFor="let MaritalStatus of maritalstatuses()" [value]="MaritalStatus.id">
                           {{ MaritalStatus.text }}
                         </option>
                       </select>
@@ -252,7 +252,7 @@
                       <label for="idWeekOff" class="form-label">Week Off</label>
                       <select formControlName="idWeekOff" class="form-control">
                         <option value="">-- Select Week Off --</option>
-                        <option *ngFor="let WeekOff of weekoffs" [value]="WeekOff.id">
+                        <option *ngFor="let WeekOff of weekoffs()" [value]="WeekOff.id">
                           {{ WeekOff.text }}
                         </option>
                       </select>
@@ -262,7 +262,7 @@
                       <label for="idReportingManager" class="form-label">Reporting Manager</label>
                       <select formControlName="idReportingManager" class="form-control">
                         <option value="">-- Select Reporting Manager --</option>
-                        <option *ngFor="let ReportingManager of reportingmanagers" [value]="ReportingManager.id">
+                        <option *ngFor="let ReportingManager of reportingmanagers()" [value]="ReportingManager.id">
                           {{ ReportingManager.text }}
                         </option>
                       </select>
@@ -276,7 +276,7 @@
                         accept="image/*"
                         (change)="onEmployeeImageSelected($event)"
                         class="form-control"
-                        [disabled]="isReadonly"
+                        [disabled]="isReadonly()"
                       />
                     </div>
                 </div>
@@ -302,18 +302,18 @@
                 </div> -->
 
 
-                <div class="row justify-content-center">
-  <div class="col-12 mb-3 text-end">
-    <label class="form-label fw-bold">Image Preview</label><br />
-    <img
-      *ngIf="employeeForm.get('employeeImageBase64')?.value"
-      [src]="'data:image/' + employeeForm.get('employeeImageExtension')?.value + ';base64,' + employeeForm.get('employeeImageBase64')?.value"
-      alt="Preview"
-      class="img-thumbnail"
-      style="width: 180px; height: 180px; object-fit: cover;"
-    />
-  </div>
-</div>
+                  <div class="row justify-content-center">
+                      <div class="col-12 mb-3 text-end">
+                        <label class="form-label fw-bold">Image Preview</label><br />
+                        <img
+                          *ngIf="employeeForm.get('employeeImageBase64')?.value"
+                          [src]="'data:image/' + employeeForm.get('employeeImageExtension')?.value + ';base64,' + employeeForm.get('employeeImageBase64')?.value"
+                          alt="Preview"
+                          class="img-thumbnail"
+                          style="width: 180px; height: 180px; object-fit: cover;"
+                        />
+                      </div>
+                  </div>
 
 
 
@@ -366,7 +366,7 @@
                         <td>
                           <select formControlName="idEducationLevel" class="form-control form-control-sm">
                             <option value="">-- Select EducationLevel --</option>
-                            <option *ngFor="let educationlevel of educationlevels" [value]="educationlevel.id">{{ educationlevel.text }}</option>
+                            <option *ngFor="let educationlevel of educationlevels()" [value]="educationlevel.id">{{ educationlevel.text }}</option>
                           </select>
                           
                            <div class="invalid-feedback d-block" *ngIf="edu.get('idEducationLevel')?.invalid">
@@ -377,7 +377,7 @@
                         <td>
                           <select formControlName="idEducationExamination" class="form-control form-control-sm">
                             <option value="">-- Select Education Examination --</option>
-                            <option *ngFor="let educationexamination of educationexaminations" [value]="educationexamination.id">{{ educationexamination.text }}</option>
+                            <option *ngFor="let educationexamination of educationexaminations()" [value]="educationexamination.id">{{ educationexamination.text }}</option>
                           </select>
                            <div class="invalid-feedback d-block" *ngIf="edu.get('idEducationExamination')?.invalid">
                                 EducationExamination is required.
@@ -387,7 +387,7 @@
                         <td>
                           <select formControlName="idEducationResult" class="form-control form-control-sm">
                             <option value="">-- Select Education Result --</option>
-                            <option *ngFor="let educationresult of educationresults" [value]="educationresult.id">{{ educationresult.text }}</option>
+                            <option *ngFor="let educationresult of educationresults()" [value]="educationresult.id">{{ educationresult.text }}</option>
                           </select>
                            <div class="invalid-feedback d-block" *ngIf="edu.get('idEducationResult')?.invalid">
                                 EducationResult is required.
@@ -437,13 +437,13 @@
                         </td>
                         <td>
                           <input type="number" class="form-control form-control-sm" formControlName="passingYear" />
-                          <div class="invalid-feedback d-block" *ngIf="edu.get('major')?.invalid">
+                          <div class="invalid-feedback d-block" *ngIf="edu.get('passingYear')?.invalid">
                             Passing Year is required.
                           </div>
                         </td>
                         <td>
                           <input type="text" class="form-control form-control-sm" formControlName="instituteName" />
-                          <div class="invalid-feedback d-block" *ngIf="edu.get('major')?.invalid">
+                          <div class="invalid-feedback d-block" *ngIf="edu.get('instituteName')?.invalid">
                             Institutename is required.
                           </div>
                         </td>
@@ -454,7 +454,7 @@
                           <input type="text" class="form-control form-control-sm" formControlName="achievement" />
                         </td>
                         <td>
-                          <button type="button" class="btn btn-sm btn-danger" (click)="removeEducation(i)" [disabled]="isReadonly" >Remove</button>
+                          <button type="button" class="btn btn-sm btn-danger" (click)="removeEducation(i)" [disabled]="isReadonly()" >Remove</button>
                         </td>
 
                         
@@ -463,7 +463,7 @@
                   </table>
                 </div>
 
-                    <button type="button" class="btn btn-sm btn-primary mb-2" (click)="addEducation()" [disabled]="isReadonly">Add Education</button>
+                    <button type="button" class="btn btn-sm btn-primary mb-2" (click)="addEducation()" [disabled]="isReadonly()">Add Education</button>
 
               </div>
             </div>
@@ -549,11 +549,11 @@
                           type="file" 
                           accept="image/*" 
                           (change)="onImageSelected($event, i)" 
-                          [disabled]="isReadonly"
+                          [disabled]="isReadonly()"
                         />
                       </td>
                       <td>
-                        <button type="button" class="btn btn-sm btn-danger" (click)="removeDocument(i)" [disabled]="isReadonly">Remove</button>
+                        <button type="button" class="btn btn-sm btn-danger" (click)="removeDocument(i)" [disabled]="isReadonly()">Remove</button>
                       </td>     
                     </tr>
 
@@ -562,7 +562,7 @@
                     </tbody>
                   </table>
                 </div>
-                <button type="button" class="btn btn-sm btn-primary" (click)="addDocument()" [disabled]="isReadonly">Add Document</button>
+                <button type="button" class="btn btn-sm btn-primary" (click)="addDocument()" [disabled]="isReadonly()">Add Document</button>
 
               </div>
             </div>
@@ -617,13 +617,13 @@
                          <input type="date" class="form-control" formControlName="toDate" /> 
                         </td>
                         <td>
-                          <button type="button" class="btn btn-sm btn-danger" (click)="removeCertification(i)" [disabled]="isReadonly">Remove</button>
+                          <button type="button" class="btn btn-sm btn-danger" (click)="removeCertification(i)" [disabled]="isReadonly()">Remove</button>
                         </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <button type="button" class="btn btn-sm btn-primary" (click)="addCertification()" [disabled]="isReadonly">Add Certification</button>
+                <button type="button" class="btn btn-sm btn-primary" (click)="addCertification()" [disabled]="isReadonly()">Add Certification</button>
 
               </div>
            </div>
@@ -669,7 +669,7 @@
                         <td>
                           <select formControlName="idGender" class="form-control form-control-sm">
                             <option value="">-- Select Gender --</option>
-                            <option *ngFor="let gender of genders" [value]="gender.id">{{ gender.text }}</option>
+                            <option *ngFor="let gender of genders()" [value]="gender.id">{{ gender.text }}</option>
                           </select>
                           <div class="invalid-feedback d-block" *ngIf="family.get('idGender')?.invalid">
                             Gender is required.
@@ -679,7 +679,7 @@
                         <td>
                           <select formControlName="idRelationship" class="form-control form-control-sm">
                             <option value="">-- Select Relationship --</option>
-                            <option *ngFor="let relation of relationships" [value]="relation.id">{{ relation.text }}</option>
+                            <option *ngFor="let relation of relationships()" [value]="relation.id">{{ relation.text }}</option>
                           </select>
                           <div class="invalid-feedback d-block" *ngIf="family.get('idRelationship')?.invalid">
                             relationships is required.
@@ -703,14 +703,14 @@
                         </td>
 
                         <td>
-                          <button type="button" class="btn btn-sm btn-danger" (click)="removeFamilyInfo(i)" [disabled]="isReadonly">Remove</button>
+                          <button type="button" class="btn btn-sm btn-danger" (click)="removeFamilyInfo(i)" [disabled]="isReadonly()">Remove</button>
                         </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
 
-                <button type="button" class="btn btn-sm btn-primary" (click)="addFamilyInfo()" [disabled]="isReadonly">Add Family Member</button>
+                <button type="button" class="btn btn-sm btn-primary" (click)="addFamilyInfo()" [disabled]="isReadonly()">Add Family Member</button>
 
               </div>
             </div>
@@ -721,7 +721,7 @@
 
 
            <!-- Submit -->
-          <button type="submit" class="btn btn-primary mt-2" [disabled]="isReadonly">Save</button>
+          <button type="submit" class="btn btn-primary mt-2" [disabled]="isReadonly()">Save</button>
 
           </form>
      

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Signal } from '@angular/core';
 import { EmployeeService } from '../../services/employee.service';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { EmployeeDTO } from '../../models/employee.dto';
@@ -10,6 +10,7 @@ import { BaseDropdownDto } from '../../models/dropdowndto';
 import { EmployeeDocumentDTO } from '../../models/employeedocumentdto';
 import { EmployeeFamilyInfoDTO } from '../../models/employeefamililyinfodto';
 import { EmployeeProfessionalCertificationDTO } from '../../models/employeeprofessionalcerdto';
+import { signal,computed } from '@angular/core';
 
 @Component({
   selector: 'app-employee-list',
@@ -21,12 +22,20 @@ import { EmployeeProfessionalCertificationDTO } from '../../models/employeeprofe
 })
 export class EmployeeListComponent implements OnInit {
 
-  employees: EmployeeDTO[] = [];
-  filteredEmployees: EmployeeDTO[] = [];
+
+  employees = signal<EmployeeDTO[]>([]);
+  selectedDesignation = signal<string | null>(null);
+
+  filteredEmployees = computed(() => {
+      const selected = this.selectedDesignation();
+      const all = this.employees();
+      if (!selected) return all;
+      return all.filter(e => e.designationName === selected);
+    });
 
 
 
-  designationList: string[] = [];
+  designationList = signal<string[]>([]);
   selectedEmployeeId: number | null = null;
   fileToUpload: File | null = null;
 
@@ -34,22 +43,22 @@ export class EmployeeListComponent implements OnInit {
 
   employeeForm!: FormGroup;
   filterForm!: FormGroup;
-  departments: BaseDropdownDto[] = [];
-  sections : BaseDropdownDto[] = [];
-  designations : BaseDropdownDto[] = [];
-  employeetypes : BaseDropdownDto[] = [];
-  jobtypes : BaseDropdownDto [] = [];
-  genders : BaseDropdownDto [] = [];
-  religions : BaseDropdownDto[] = [];
-  maritalstatuses : BaseDropdownDto[] = [];
-  weekoffs : BaseDropdownDto[] = [];
-  reportingmanagers : BaseDropdownDto[] = [];
-  relationships : BaseDropdownDto[] = []
-  educationlevels: BaseDropdownDto[] = []; 
-  educationexaminations: BaseDropdownDto[] = []; 
-  educationresults: BaseDropdownDto[] = [];
+  departments = signal<BaseDropdownDto[]>([]);
+  sections = signal<BaseDropdownDto[]>([]);
+  designations = signal<BaseDropdownDto[]>([]);
+  employeetypes = signal<BaseDropdownDto[]>([]);
+  jobtypes = signal<BaseDropdownDto[]>([]);
+  genders = signal<BaseDropdownDto[]>([]);
+  religions = signal<BaseDropdownDto[]>([]);
+  maritalstatuses = signal<BaseDropdownDto[]>([]);
+  weekoffs = signal<BaseDropdownDto[]>([]);
+  reportingmanagers = signal<BaseDropdownDto[]>([]);
+  relationships = signal<BaseDropdownDto[]>([]);
+  educationlevels = signal<BaseDropdownDto[]>([]);
+  educationexaminations = signal<BaseDropdownDto[]>([]);
+  educationresults = signal<BaseDropdownDto[]>([]);
 
-  isReadonly = false;
+  isReadonly = signal(false);
 
 
   
@@ -71,33 +80,18 @@ export class EmployeeListComponent implements OnInit {
     
 
     
-      // this.buildForm();
-
-
-    this.filterForm = this.fb.group({
-      selectedDesignation: ['']
-    });
-
-        this.filterForm.get('selectedDesignation')?.valueChanges.subscribe(selected => {
-        if (!selected) {
-          this.filteredEmployees = [...this.employees]; // Show all if "All" is selected
-        } else {
-          this.filteredEmployees = this.employees.filter(e => e.designationName === selected);
-        }
-      });
-
-      
   }
 
   loadEmployees() {
    
     this.employeeService.getAllEmployees().subscribe(data => {
-      this.employees = data;
-      this.filteredEmployees = data;
-
+      this.employees.set(data);
+     
       // Unique designation list
-       this.designationList = [...new Set(data.map(e => e.designationName).filter(d => d !== null))].sort() as string[];
-    });
+      this.designationList.set(
+      [...new Set(data.map(e => e.designationName).filter(d => d !== null))].sort() as string[]
+    );
+  });
     this.loadDropdowns();
       
   }
@@ -105,68 +99,62 @@ export class EmployeeListComponent implements OnInit {
   loadDropdowns()
   {
       const IdClient = 10001001;
+
       this.dropdownservice.getDepartments(IdClient).subscribe(res => {
-      this.departments = res;
+      this.departments.set(res);
     });
 
      this.dropdownservice.getSections(IdClient).subscribe(res => {
-      this.sections = res;
+      this.sections.set(res);
     });
 
      this.dropdownservice.getDesignations(IdClient).subscribe(res => {
-      this.designations = res;
+      this.designations.set(res);
     });
 
      this.dropdownservice.getEmployeeTypes(IdClient).subscribe(res => {
-      this.employeetypes = res;
+      this.employeetypes.set(res);
     });
 
     this.dropdownservice.getJobTypes(IdClient).subscribe(res => {
-      this.jobtypes = res;
+      this.jobtypes.set(res);
     });
 
      this.dropdownservice.getGenders(IdClient).subscribe(res => {
-      this.genders = res;
+      this.genders.set(res);
     });
 
 
      this.dropdownservice.getReligions(IdClient).subscribe(res => {
-      this.religions = res;
+      this.religions.set(res);
     });
 
-     this.dropdownservice.getMaritalStatuses(IdClient).subscribe(res => {
-      this.maritalstatuses = res;
+      this.dropdownservice.getMaritalStatuses(IdClient).subscribe(res => {
+      this.maritalstatuses.set(res);
     });
-
 
     this.dropdownservice.getWeekOffs(IdClient).subscribe(res => {
-      this.weekoffs = res;
+      this.weekoffs.set(res);
     });
 
-     this.dropdownservice.getReportingManagers(IdClient).subscribe(res => {
-      this.reportingmanagers = res;
+    this.dropdownservice.getReportingManagers(IdClient).subscribe(res => {
+      this.reportingmanagers.set(res);
     });
 
-
-
-     this.dropdownservice.getRelationships(IdClient).subscribe(res => {
-      this.relationships = res;
+    this.dropdownservice.getRelationships(IdClient).subscribe(res => {
+      this.relationships.set(res);
     });
 
-
-    
-     this.dropdownservice.getEducationLevels(IdClient).subscribe(res => {
-      this.educationlevels = res;
+    this.dropdownservice.getEducationLevels(IdClient).subscribe(res => {
+      this.educationlevels.set(res);
     });
 
-
-      this.dropdownservice.getEducationExaminations(IdClient).subscribe(res => {
-      this.educationexaminations = res;
+    this.dropdownservice.getEducationExaminations(IdClient).subscribe(res => {
+      this.educationexaminations.set(res);
     });
 
-
-      this.dropdownservice.getEducationResult(IdClient).subscribe(res => {
-      this.educationresults = res;
+    this.dropdownservice.getEducationResult(IdClient).subscribe(res => {
+      this.educationresults.set(res);
     });
 
 
@@ -175,13 +163,9 @@ export class EmployeeListComponent implements OnInit {
 
 
   }
-   
-  applyFilter(selected: string) {
-    if (selected) {
-      this.filteredEmployees = this.employees.filter(emp => emp.designationName === selected);
-    } else {
-      this.filteredEmployees = this.employees;
-    }
+    
+    applyFilter(selected: string | null) {
+    this.selectedDesignation.set(selected); // 👈 update the signal
   }
 
   onAddNew() {
@@ -191,7 +175,7 @@ export class EmployeeListComponent implements OnInit {
     this.buildCertificationForm();
     this.buildDocumentForm();
     this.buildFamilyForm();
-    this.isReadonly = false;
+    this.isReadonly.set(false);
       
     
   }
@@ -212,7 +196,7 @@ export class EmployeeListComponent implements OnInit {
       });
 
       this.employeeForm.disable();
-      this.isReadonly = true;
+      this.isReadonly.set(true);
     });
   }
 
@@ -234,21 +218,12 @@ onEdit(id: number) {
     });
 
     this.employeeForm.enable();
-    this.isReadonly = false;
+    this.isReadonly.set(false);
   });
 }
 
 
 
-  //   onEdit(id: number) {
-  //   if (!this.selectedEmployeeId) return;
-
-  //   // Enable the form for editing
-  //   this.employeeForm.enable();
-
-  //   // Mark readonly flag as false (editing mode)
-  //   this.isReadonly = false;
-  // }
 
 
 
@@ -541,7 +516,7 @@ onEdit(id: number) {
   if (documentArray && documentArray.length > 0) {
     const documents = documentArray.value.map((doc: any) => ({
       ...doc,
-      id: doc.id ?? null,                    // existing record id
+       id: doc.id ?? null,                    // existing record id
       IdClient: +doc.IdClient,   
       documentName: doc.documentName || '',
       filename: doc.filename || '',
@@ -558,7 +533,7 @@ onEdit(id: number) {
   if (certArray && certArray.length > 0) {
     const certifications = certArray.value.map((cert: any) => ({
       ...cert,
-      id: cert.id ?? null,                    // existing record id
+       id: cert.id ?? null,                    // existing record id
       IdClient: +cert.IdClient,
       certificationTitle: cert.certificationTitle?.trim() || '',
       certificationInstitute: cert.certificationInstitute?.trim() || '',
@@ -576,7 +551,7 @@ onEdit(id: number) {
   if (familyArray && familyArray.length > 0) {
     const familyInfos = familyArray.value.map((fam: any) => ({
       ...fam,
-      id: fam.id ?? null,                    // existing record id
+       id: fam.id ?? null,                    // existing record id
       IdClient: +fam.IdClient,
       name: fam.name?.trim() || '',
       idGender: fam.idGender ? +fam.idGender : null,
@@ -592,41 +567,40 @@ onEdit(id: number) {
 
 
   // Append image file (if any)
-      if (this.selectedImageFile) {
-        formData.append('employeeImage', this.selectedImageFile);
-      }
+  if (this.selectedImageFile) {
+    formData.append('employeeImage', this.selectedImageFile);
+  }
 
   
 
-      if (this.selectedEmployeeId) {
-        //formData.append('id', this.selectedEmployeeId!.toString());
+  if (this.selectedEmployeeId) {
+      //formData.append('id', this.selectedEmployeeId!.toString());
 
-        this.employeeService.updateEmployee(formData).subscribe({
+      this.employeeService.updateEmployee(formData).subscribe({
+        next: (res) => {
+          alert('Employee updated successfully!');
+          this.isReadonly.set(true);
+          this.loadEmployees();
+          this.viewEmployeeDetails(this.selectedEmployeeId!);
+        },
+        error: (err) => {
+          console.error('Error updating employee:', err);
+        }
+      });
+      } else {
+        this.employeeService.createEmployee(formData).subscribe({
           next: (res) => {
-            alert('Employee updated successfully!');
-            this.isReadonly = true;
+            alert('Employee created successfully!');
+            this.isReadonly.set(true);
             this.loadEmployees();
-            this.viewEmployeeDetails(this.selectedEmployeeId!);
           },
           error: (err) => {
-            console.error('Error updating employee:', err);
+            console.error('Error creating employee:', err);
           }
         });
-        } else {
-          this.employeeService.createEmployee(formData).subscribe({
-            next: (res) => {
-              alert('Employee created successfully!');
-              this.isReadonly = true;
-              this.loadEmployees();
-            },
-            error: (err) => {
-              console.error('Error creating employee:', err);
-            }
-          });
-        }
+      }
 
-      } 
- 
+}
 
 
 
@@ -635,54 +609,55 @@ onEdit(id: number) {
 
 
 
-  onEmployeeImageSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
 
-      // Store in a class property if needed later
-      this.selectedImageFile = file;
+    onEmployeeImageSelected(event: Event): void {
+      const input = event.target as HTMLInputElement;
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
 
-      // Patch correct field name to the form
-      this.employeeForm.patchValue({ employeeImage: file }); // <-- match DTO name
-      this.employeeForm.get('employeeImage')?.updateValueAndValidity();
+        // Store in a class property if needed later
+        this.selectedImageFile = file;
 
-      // Optional: set preview
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64String = (reader.result as string).split(',')[1];
-        this.employeeForm.patchValue({
-          employeeImageBase64: base64String,
-          employeeImageExtension: file.name.split('.').pop()
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  }
+        // Patch correct field name to the form
+        this.employeeForm.patchValue({ employeeImage: file }); // <-- match DTO name
+        this.employeeForm.get('employeeImage')?.updateValueAndValidity();
 
-  onImageSelected(event: Event, index: number): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      const documentsArray = this.employeeForm.get('employeeDocument') as FormArray;
-      if (documentsArray && documentsArray.at(index)) {
-        const docGroup = documentsArray.at(index);
-        docGroup.patchValue({
-          filename: file.name,
-          uploadedFileExtention: file.name.split('.').pop()
-        });
-        // Optionally store base64 if needed
+        // Optional: set preview
         const reader = new FileReader();
         reader.onload = () => {
           const base64String = (reader.result as string).split(',')[1];
-          docGroup.patchValue({
-            uploadedFileBase64: base64String // if you have this control
+          this.employeeForm.patchValue({
+            employeeImageBase64: base64String,
+            employeeImageExtension: file.name.split('.').pop()
           });
         };
         reader.readAsDataURL(file);
       }
     }
+
+   onImageSelected(event: Event, index: number): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const documentsArray = this.employeeForm.get('employeeDocument') as FormArray;
+    if (documentsArray && documentsArray.at(index)) {
+      const docGroup = documentsArray.at(index);
+      docGroup.patchValue({
+        filename: file.name,
+        uploadedFileExtention: file.name.split('.').pop()
+      });
+      // Optionally store base64 if needed
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = (reader.result as string).split(',')[1];
+        docGroup.patchValue({
+          uploadedFileBase64: base64String // if you have this control
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   }
+}
 
 
 
@@ -704,13 +679,13 @@ onEdit(id: number) {
 
 
 
-    private formatDateForInput(dateValue: string | Date): string {
-    const date = new Date(dateValue);
-    const year = date.getFullYear();
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const day = ('0' + date.getDate()).slice(-2);
-    return `${year}-${month}-${day}`;
-  }
+  private formatDateForInput(dateValue: string | Date): string {
+  const date = new Date(dateValue);
+  const year = date.getFullYear();
+  const month = ('0' + (date.getMonth() + 1)).slice(-2);
+  const day = ('0' + date.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
+}
 
 
 

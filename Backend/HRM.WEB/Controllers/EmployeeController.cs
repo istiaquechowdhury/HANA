@@ -614,6 +614,7 @@ namespace HRM.WEB.Controllers
                     existingEntry.IdEducationExamination = item.IdEducationExamination;
                     existingEntry.IdEducationResult = item.IdEducationResult;
                     existingEntry.Cgpa = item.Cgpa;
+                    existingEntry.ExamScale = item.ExamScale;
                     existingEntry.Marks = item.Marks;
                     existingEntry.PassingYear = item.PassingYear;
                     existingEntry.InstituteName = item.InstituteName;
@@ -633,6 +634,7 @@ namespace HRM.WEB.Controllers
                         IdEducationExamination = item.IdEducationExamination,
                         IdEducationResult = item.IdEducationResult,
                         Cgpa = item.Cgpa,
+                        ExamScale = item.ExamScale,
                         Marks = item.Marks,
                         PassingYear = item.PassingYear,
                         InstituteName = item.InstituteName,
