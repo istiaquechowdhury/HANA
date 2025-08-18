@@ -20,17 +20,17 @@
     <!-- Left column with fixed height and scroll -->
     <div class="col-2" style="height: 90vh; overflow-y: auto;">
       <!-- Filter -->
-      <div class="mb-3">
+      <!-- <div class="mb-3">
       <label for="designationFilter" class="form-label">Filter by Designation:</label>
         <form [formGroup]="filterForm">
           <select id="designationFilter" class="form-select" formControlName="selectedDesignation">
             <option value="">All</option>
-            <option *ngFor="let designation of designationList()" [value]="designation">
+            <option *ngFor="let designation of selectedDesignation()" [value]="designation">
               {{ designation }}
             </option>
           </select>
         </form>
-    </div>
+    </div> -->
 
       <!-- Scrollable List -->
       <ul class="list-group">

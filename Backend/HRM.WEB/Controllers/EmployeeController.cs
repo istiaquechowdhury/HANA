@@ -105,11 +105,11 @@ namespace HRM.WEB.Controllers
 
                     EmployeefamilyInfos = e.EmployeeFamilyInfos.Select(family => new EmployeeFamilyInfoDTO
                     {
-                        Name = family.Name, 
-                        IdGender = family.IdGender, 
-                        IdRelationship = family.IdRelationship, 
+                        Name = family.Name,
+                        IdGender = family.IdGender,
+                        IdRelationship = family.IdRelationship,
 
-                    }).ToList(),    
+                    }).ToList(),
                 })
                 .ToListAsync(cancellationToken);
 
