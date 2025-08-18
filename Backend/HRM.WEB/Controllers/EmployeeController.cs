@@ -1,13 +1,10 @@
-﻿using Azure.Core;
-using HRM.WEB.ChildEntitiesDTO;
+﻿using HRM.WEB.ChildEntitiesDTO;
 using HRM.WEB.Data;
 using HRM.WEB.DTO;
 using HRM.WEB.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System.Net;
 
 namespace HRM.WEB.Controllers
 {
@@ -29,26 +26,13 @@ namespace HRM.WEB.Controllers
                 {
                     Id = e.Id,
                     EmployeeName = e.EmployeeName,
-                    EmployeeNameBangla = e.EmployeeNameBangla,
-                    FatherName = e.FatherName,
-                    MotherName = e.MotherName,
-                    BirthDate = e.BirthDate,
-                    JoiningDate = e.JoiningDate,
-                    ContactNo = e.ContactNo,
-                    NationalIdentificationNumber = e.NationalIdentificationNumber,
-                    Address = e.Address,
-                    PresentAddress = e.PresentAddress,
-                    HasOvertime = e.HasOvertime,
-                    HasAttendenceBonus = e.HasAttendenceBonus,
-                    IsActive = e.IsActive,
-                    IdDepartment = e.IdDepartment,
-                    DepartmentName = e.Department.DepartName,
-                    IdSection = e.IdSection,
-                    SectionName = e.Section.SectionName,
-                    IdDesignation = e.IdDesignation,
                     DesignationName = e.Designation != null ? e.Designation.DesignationName : null,
-                    IdEmployeeType = e.IdEmployeeType,
+
                     EmployeeTypeName = e.EmployeeType != null ? e.EmployeeType.TypeName : null,
+
+                    IdDesignation = e.IdDesignation,
+
+                    IdEmployeeType = e.IdEmployeeType,
                     IdJobType = e.IdJobType,
                     JobTypeName = e.JobType != null ? e.JobType.JobTypeName : null,
                     IdGender = e.IdGender,
@@ -67,49 +51,7 @@ namespace HRM.WEB.Controllers
                     EmployeeImageBase64 = ConvertImageToBase64(e.EmployeeImage),
 
 
-                    EmployeeDocuments = e.EmployeeDocuments.Select(doc => new EmployeeDocumentDTO
-                    {
-                        DocumentName = doc.DocumentName,
-                        FileName = doc.FileName,
-                        UploadedFileExtention = doc.UploadedFileExtention,
-                        UploadedFileBase64 = ConvertFileToBase64(doc.UploadedFile, doc.UploadedFileExtention),
 
-                    }).ToList(),
-
-                    EmployeeEducationInfos = e.EmployeeEducationInfos.Select(edu => new EmployeeEducationInfosDTO
-                    {
-                        IdEducationLevel = edu.IdEducationLevel,
-                        IdEducationExamination = edu.IdEducationExamination,
-                        IdEducationResult = edu.IdEducationResult,
-                        Cgpa = edu.Cgpa,
-                        ExamScale = edu.ExamScale,
-                        Marks = edu.Marks,
-                        Major = edu.Major,
-                        PassingYear = edu.PassingYear,
-                        InstituteName = edu.InstituteName,
-                        IsForeignInstitute = edu.IsForeignInstitute,
-                        Duration = edu.Duration,
-                        Achievement = edu.Achievement
-                    }).ToList(),
-
-                    EmployeeProfessionalCertifications = e.EmployeeProfessionalCertifications.Select(cert => new EmployeeProfessionalCertificationDTO
-                    {
-                        CertificationTitle = cert.CertificationTitle,
-                        CertificationInstitute = cert.CertificationInstitute,
-                        InstituteLocation = cert.InstituteLocation,
-                        FromDate = cert.FromDate,
-                        ToDate = cert.ToDate
-                    }).ToList(),
-
-
-
-                    EmployeefamilyInfos = e.EmployeeFamilyInfos.Select(family => new EmployeeFamilyInfoDTO
-                    {
-                        Name = family.Name,
-                        IdGender = family.IdGender,
-                        IdRelationship = family.IdRelationship,
-
-                    }).ToList(),
                 })
                 .ToListAsync(cancellationToken);
 
